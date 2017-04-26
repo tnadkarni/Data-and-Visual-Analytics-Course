@@ -1,0 +1,4 @@
+1. Force Atlas layout (Adjust by Sizes checked, repulsion strength = 1000) to ensure that the nodes were separate and labels were minimally overlapping 
+2. Only labels of PoloChau?s immediate neighbors made visible using data laboratory
+3. Node color is assigned according to modular groups and size of node proportional to degree
+

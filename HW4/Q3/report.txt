@@ -1,0 +1,40 @@
+SECTION A
+
+1.
+
+-K 0 -M 1.0 -V 0.001 -S 1
+
+Time taken to build model: 0.07 seconds
+Overall Accuracy : 97.0717 %
+
+=== Confusion Matrix ===
+
+   a   b   <-- classified as
+ 432  12 |   a = 0
+   8 231 |   b = 1
+
+2.
+
+-R 1.0E-8 -M -1
+
+Time taken to build model: 0.1 seconds
+Overall Accuracy : 96.7789 %
+
+=== Confusion Matrix ===
+
+   a   b   <-- classified as
+ 434  10 |   a = 0
+  12 227 |   b = 1
+
+SECTION B
+
+1. The result for Weka is 97.0717 % and is comparable to my model accuracy which varies between 96-98%. The results are similar since my model builds a random forest of 10 trees using bootstrapping while we apply 10 fold cross validation in Weka, both essentially the same technique.
+
+2. I chose the Logistic regression classifier whose algorithm goes this way,
+
+step 1: Assign an initial value to each coefficient and calculate probability of first training instance that belongs to class 0.
+prediction = 1 / (1 + e^(-(b0 + b1*x1 + b2*x2)))
+
+step 2: Calculate new coefficients using simple update equation: bÊ= bÊ+ alpha * (y Ð prediction) * prediction * (1 Ð prediction) * x, where alpha is learning rate.
+
+step 3: Repeat steps 1 and 2 for each training instance in the dataset and update model accordingly.

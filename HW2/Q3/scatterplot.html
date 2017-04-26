@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="../lib/d3.v3.min.js"></script>
+    <style>
+        .axis path,
+        .axis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+        } 
+        .axis text{
+        font-family: sans-serif;
+        font-size : 11px;
+        text-anchor: middle;
+        }
+        .point {
+        fill: #fff;
+        stroke: #000;
+        }
+    </style>
+    <body>
+        <script>
+        var w = 600;
+        var h = 500;
+        xpadding = 80;
+        ypadding = 50;
+        var svg1 = d3.select("body")
+                .append("svg")
+                .attr("width", w)
+                .attr("height", h);
+
+        var svg2 = d3.select("body")
+                .append("svg")
+                .attr("y", h)
+                .attr("x", 0)
+                .attr("width", w)
+                .attr("height", h);
+
+        d3.tsv("data.tsv", function(error, dataset) {
+            if (error) throw error;
+
+            dataset.forEach(function(d){
+                d.Distribution = +d.Distribution;
+                d.BodyMass = +d.BodyMass;
+            })
+
+            var xscale = d3.scale.linear()
+                                 .domain([0, d3.max(dataset, function(d) {
+                                    return d.BodyMass;
+                                 })])
+                                 .range([xpadding,w-xpadding*2]);
+            var yscale = d3.scale.linear()
+                                .domain([0, d3.max(dataset, function(d) { 
+                                    return d.Distribution; 
+                                })])
+                                .range([h-ypadding, ypadding]);
+
+            var xlogscale = d3.scale.log()
+                                .base(Math.E)
+                                 .domain([d3.min(dataset, function(d) { 
+                                    return d.BodyMass; 
+                                }), 
+                                 d3.max(dataset, function(d) {
+                                    return d.BodyMass;
+                                 })])
+                                 .range([xpadding,w-xpadding*2]);
+            var ylogscale = d3.scale.log()
+                                .base(Math.E)
+                                .domain([d3.min(dataset, function(d) { 
+                                    return d.Distribution; 
+                                })
+                                , d3.max(dataset, function(d) { 
+                                    return d.Distribution; 
+                                })])
+                                .range([h-ypadding, ypadding]);
+
+            [svg1, svg2].forEach(function(svg){
+
+            svg.selectAll(".point")
+               .data(dataset)
+               .enter().append("path")
+               .attr("class", "point")
+               .attr("d", function(d){
+                   if (d.Species == "Lagomorpha") { symbolType = d3.svg.symbol().type("circle");}
+                   if (d.Species == "Didelphimorphia") { symbolType = d3.svg.symbol().type("square");}
+                   if (d.Species == "Dasyuromorphia") { symbolType = d3.svg.symbol().type("triangle-up");}
+                   return symbolType(d);
+               })
+               .style("stroke", function(d){
+                   if (d.Species == "Lagomorpha") { return "red"}
+                   if (d.Species == "Didelphimorphia") { return "blue";}
+                   if (d.Species == "Dasyuromorphia") { return "green";}
+               })
+               .attr("transform", function(d) { 
+                if (svg == svg1) {return "translate(" + xscale(d.BodyMass) + "," + yscale(d.Distribution) + ")";}
+                if (svg == svg2) {
+                    return "translate(" + xlogscale(d.BodyMass) + "," + ylogscale(d.Distribution) + ")";}
+                });
+
+               svg.append("g")
+                .attr("class", "axis")
+                .attr("transform", "translate(0, "+ (h-ypadding) +")")
+                .call(d3.svg.axis()
+                .scale(xscale)
+                .orient("bottom"));
+               svg.append("g")
+                .attr("class", "axis")
+                .attr("transform", "translate("+ xpadding +", 0)")
+                .call(d3.svg.axis()
+                .scale(yscale)
+                .orient("left"));
+
+            //Create X axis label   
+                svg.append("text")
+                .attr("class", "axis")
+                .attr("x", w / 2 )
+                .attr("y",  h-ypadding + 40 )
+                .style("text-anchor", "middle")
+                .text("BodyMass");
+
+                //Create Y axis label
+                svg.append("text")
+                .attr("class", "axis")
+                .attr("transform", "rotate(-90)")
+                .attr("y", xpadding - 60 )
+                .attr("x",0 - (h / 2))
+                .attr("dy", "1em")
+                .text("Distribution"); 
+
+            });
+
+            labels = ["Lagomorpha", "Didelphimorphia", "Dasyuromorphia"];
+
+            var colorScale = d3.scale.ordinal()
+                            .domain(labels)
+                            .range(["red", "blue", "green"]);
+
+            var symbolScale = d3.scale.ordinal()
+                            .domain(labels)
+                            .range(["circle", "square", "triangle-up"]);
+
+
+            var legend1 = svg1.selectAll(".legend")
+                        .data(labels)
+                        .enter().append("g")
+                        .attr("class", "legend");
+
+            var legend2 = svg2.selectAll(".legend")
+                        .data(labels)
+                        .enter().append("g")
+                        .attr("class", "legend");
+
+            [legend1, legend2].forEach(function(legend){
+
+            labels.forEach(function(d,i){
+             x = w - 105;
+             y = 10 + i*20;
+
+            var symbol = d3.svg.symbol()
+                        .type(symbolScale(d));
+            
+            legend.append("path")
+                    .attr("d", symbol)
+                    .attr("class", "legend")
+                    .attr("fill", "white")
+                    .attr("stroke", colorScale(d))
+                    .attr('transform', 'translate(' + x + ',' + y + ')');;
+
+
+            legend.append("text")
+                    .attr("font-size", "12px")
+                    .attr("class", "legend")
+                    .attr("x", x+10)
+                    .attr("y", y+5)
+                    .text(d);
+
+            });
+
+
+
+            });
+
+        });
+        </script>
+            
+    </body>
+</html>     

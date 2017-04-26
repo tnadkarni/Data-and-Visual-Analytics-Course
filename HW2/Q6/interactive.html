@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="../lib/d3.v3.min.js"></script>
+    <style>
+        .bar
+        {
+        fill : #808080;
+        }
+        .bar:hover {
+        fill : steelblue;
+        }
+        .qbar{
+            fill: steelblue;
+        }
+    </style>
+    <body>
+        <script>
+        var w = 800;
+        var h = 500;
+        xpadding = 80;
+        ypadding = 50;
+
+        var data = [{product:'Product A',freq:{Q1:576, Q2:1176, Q3:1009, Q4:494}},
+                    {product:'Product B',freq:{Q1:959, Q2:1653, Q3:1999, Q4:697}},
+                    {product:'Product C',freq:{Q1:3210, Q2:4220, Q3:1648, Q4:919}},
+                    {product:'Product D',freq:{Q1:589, Q2:2043, Q3:1153, Q4:911}},
+                    {product:'Product E',freq:{Q1:2599, Q2:1333, Q3:818, Q4:1713}},
+                    {product:'Product F',freq:{Q1:431, Q2:324, Q3:715, Q4:421}},
+                    {product:'Product G',freq:{Q1:1457, Q2:2557, Q3:2245, Q4:762}},
+                    {product:'Product H',freq:{Q1:2573, Q2:3357, Q3:1598, Q4:1287}}];
+
+        var div = d3.select("body").append("div").attr("class", "toolTip");
+
+        var svg = d3.select("body")
+                .append("svg")
+                .attr("width", w)
+                .attr("height", h);
+
+        var maxQR = 0;
+
+        data.forEach(function(d){
+            d.total = d3.sum(d3.values(d.freq));
+            maxval = d3.max(d3.values(d.freq));
+            if(maxval > maxQR) {
+                maxQR = maxval;
+            }
+        });
+
+        console.log(maxQR);
+
+        data = data.reverse();
+
+        var xscale = d3.scale.linear()
+                    .domain([0, d3.max(data, function(d){
+                        return d.total;   
+                    })])
+                     .range([xpadding,(w-xpadding*2)/1.5]);
+        var yscale = d3.scale.ordinal()
+                                .domain(data.map(function(d){ return d.product;}))
+                                .rangeRoundBands([h-ypadding, ypadding], 0.05);
+
+        bar = svg.append("g").selectAll(".bar")
+                .data(data)
+                .enter()
+                .append("g");
+
+        labelwidth = 80;
+
+            bar.append("rect")
+                .attr("class", "bar")
+                .attr("y", function(d) {return yscale(d.product);})
+                .attr("height", "30px")
+                .attr("x", labelwidth)
+                .attr("width", function(d) {return xscale(d.total);})
+
+             bar.append("text")
+                .style("fill", "#fff")
+                .attr("text-anchor", "start")
+                .attr("x", labelwidth+5)
+                .attr("font-family", "sans-serif")
+                .attr("y", function(d){return yscale(d.product)+20;})
+                .text(function(d) {return "$" + d.total.toString();});
+
+            bar.append("text")
+                .style("fill", "#808080")
+                .attr("text-anchor", "start")
+                .attr("x", 0)
+                .attr("y", function(d){return yscale(d.product)+20;})
+                .attr("font-family", "sans-serif")
+                .text(function(d) {return d.product;});
+
+            bar.on("mouseover", function(d) { return onHover(d);});
+            
+            bar.on("mouseout", function(d) { return onLeave(d);});
+
+            var qw = w/3;
+            var qh = h/4;
+            var qxpadding = 5;
+            var qypadding = 5;
+
+            function onHover(d) {
+
+                qkeys = d3.keys(d.freq);
+                qvalues = d3.values(d.freq);
+
+                var qxscale = d3.scale.linear()
+                                .domain([0, maxQR])
+                                .range([qxpadding,(qw-qxpadding*2)]);
+                var qyscale = d3.scale.ordinal()
+                                .domain(qkeys)
+                                .rangeRoundBands([qypadding, qh-qypadding], 0.1);
+                
+                var qdata = [];
+
+                qkeys.forEach(function(d,i){
+                    qdata[i] = { quarter: qkeys[i] , value: qvalues[i]};
+                });
+
+                qbar = svg.append("g").selectAll(".qbar")
+                        .data(qdata)
+                        .enter()
+                        .append("g");
+
+                qdata.forEach(function(d){
+                        console.log(qyscale(d.quarter));
+                });
+
+                qbar.append("rect")
+                .attr("class", "qbar")
+                .attr("y", function(d) {return qyscale(d.quarter);})
+                .attr("height", "15px")
+                .attr("x", 2*qw)
+                .attr("width", function(d) {return qxscale(d.value);})
+
+                qbar.append("text")
+                .style("fill", "black")
+                .attr("text-anchor", "start")
+                .attr("x", 2*qw+5)
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "12px")
+                .attr("y", function(d){return qyscale(d.quarter)+12;})
+                .text(function(d) {return "$" + d.value.toString();});
+
+                qbar.append("text")
+                .style("fill", "#808080")
+                .attr("text-anchor", "end")
+                .attr("x", 2*qw-2)
+                .attr("y", function(d){return qyscale(d.quarter)+12;})
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "12px")
+                .text(function(d) {return d.quarter;});
+            }
+
+            function onLeave(d) {
+                qbar.remove();
+            }
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+        </script>
+            
+    </body>
+</html>     

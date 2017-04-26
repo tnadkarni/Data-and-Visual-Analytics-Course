@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="..\lib\d3.v3.min.js"></script>
+    <style>
+        .axis path,
+        .axis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+        } 
+        .axis text{
+        font-family: sans-serif;
+        font-size : 13px;
+        text-anchor: middle;
+        }
+        .point {
+        fill: #fff;
+        stroke: #000;
+        }
+        #dropdown {
+            position:relative;
+            bottom: 450px;
+            right: 300px;
+        }
+    </style>
+    <body>
+        <script>
+        var w = 800;
+        var h = 500;
+        xpadding = 80;
+        ypadding = 50;
+
+        var svg = d3.select("body")
+                .append("svg")
+                .attr("width", w)
+                .attr("height", h);
+
+
+        d3.csv("heatmap.csv", function(error, dataset1) {
+            if (error) throw error;
+
+            dataset1.forEach(function(d){
+                d.Zip = +d['Zip Code'];
+                d.Month = +d.Month;
+                d.Year = +d.Year;
+                d.Power = +d.Power
+            });
+
+            dataset = dataset1.filter(function(d){
+                    return(d.Zip == 90077);
+                });
+            updateHeatmap(dataset);
+
+
+            var zipList = [];
+
+            dataset1.map(function(d){
+                if (zipList.indexOf(d.Zip) == -1) { zipList.push(d.Zip)};
+            });
+
+            var dropDown = d3.select("body")
+                            .append("select")
+                            .attr("id", "dropdown");
+
+            var options = dropDown.selectAll("option")
+                          .data(zipList)
+                          .enter()
+                          .append("option");
+
+            options.text(function(d){ return d;})
+                    .attr("value", function(d) {return d;});
+
+            d3.select("#dropdown")
+                .on("change", function(){
+                var zipSelect = d3.select(this).property("value");
+                dataset = dataset1.filter(function(d){
+                    return(d.Zip == zipSelect);
+                });
+                updateHeatmap(dataset);
+
+            });
+
+        });
+
+        function updateHeatmap(dataset) {
+
+            var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+            gridSize = 40;
+            var xscale = d3.scale.linear()
+                                 .domain([1, 12])
+                                 .range([xpadding,w-xpadding*2]);
+            var yscale = d3.scale.linear()
+                                .domain([d3.min(dataset, function(d){ return d.Year;})
+                                , d3.max(dataset, function(d) { return d.Year;})])
+                                .range([h-ypadding-gridSize, ypadding]);
+
+            minVal = d3.min(dataset, function(d){
+                return d.Power;
+            });
+
+            maxVal = d3.max(dataset, function(d){
+                return d.Power;
+            });
+
+            gridSize = 47;
+
+            colors = ["ffe8e5", "#ffd1cc", "#e5a099", "#ff7566", "#cc4233", "#ff3019", "#990f00"];
+
+            var colorScale = d3.scale.quantile()
+            .domain([Math.floor(minVal/100)*100, Math.floor(maxVal/100)*100])
+            .range(colors);
+
+            svg.selectAll(".chart")
+                .data(dataset)
+                .enter().append("rect")
+                .attr("width", gridSize)
+                .attr("height", gridSize-6)
+                .style("fill", function(d){
+                    return colorScale(d.Power);
+                })
+                .attr("transform", function(d){
+                    return "translate(" + xscale(d.Month) + "," + yscale(d.Year) + ")";
+                });
+
+            svg.append("g")
+                .attr("class", "axis")
+                .attr("transform", "translate("+ gridSize/2 +", "+ (h-ypadding) +")")
+                .call(d3.svg.axis()
+                .scale(xscale)
+                .tickFormat(function(d,i) { return months[i];})
+                .orient("bottom"));
+            
+            svg.append("g")
+                .attr("class", "axis")
+                .attr("transform", "translate("+ xpadding +","+ gridSize/2 +")")
+                .call(d3.svg.axis()
+                .scale(yscale)
+                .tickFormat(d3.format("d"))
+                .orient("left"));
+
+                svg.append("text")
+                .attr("x", w / 2 )
+                .attr("y", ypadding/2)
+                .style("text-anchor", "middle")
+                .style("font-size", "20px")
+                .style("fill", "#000")
+                .text("WATER USAGE HEATMAP");
+
+            //Create X axis label   
+                svg.append("text")
+                .attr("class", "axis")
+                .attr("x", w/2 )
+                .attr("y",  h-ypadding + 40 )
+                .style("text-anchor", "middle")
+                .text("Month");
+
+                //Create Y axis label
+                svg.append("text")
+                .attr("class", "axis")
+                .attr("transform", "rotate(-90)")
+                .attr("y", xpadding - 60)
+                .attr("x",0 - (h / 2))
+                .attr("dy", "1em")
+                .text("Year");
+
+
+            var legend = svg.selectAll(".legend")
+                        .data(colorScale.quantiles().concat([Math.floor(maxVal/100)*100]))
+                        .enter().append("g")
+                        .attr("class", "legend");
+
+            legend.append("rect")
+                    .attr("height", gridSize-5)
+                    .attr("width", gridSize-5)
+                    .style("fill", function(d,i){
+                    return colors[i];
+                    })
+                    .attr("x", w-xpadding)
+                    .attr("y", function(d,i) {return i*gridSize-5});
+
+            legend.append("text")
+                .text(function(d,i){ return Math.ceil(colorScale.quantiles().concat([Math.floor(maxVal/100)*100])[i])})
+                .attr("x", w-xpadding+gridSize)
+                .attr("y", function(d,i) {return (i+0.5)*gridSize});
+        
+        };
+
+        </script>
+            
+    </body>
+</html>     

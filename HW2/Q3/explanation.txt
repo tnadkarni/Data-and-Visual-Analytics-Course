@@ -1,0 +1,1 @@
+For data that ranges over several magnitudes, a better visualization can be seen using a log transformation. Here, BodyMass ranges from as low as 4 to about 30,000. It is seen that the log transformation causes points to be distributed more uniformly through the graph.

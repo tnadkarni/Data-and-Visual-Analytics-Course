@@ -1,0 +1,8 @@
+1. Bootstrap dataset and train n decision trees (steps 2-5)
+2. For each level, select m = sqrt(n) predictors randomly
+3. For each predictor, partition on every possible value and calculate information gain using entropy. 
+4. Use predictor and value with maximum IG while moving down tree (steps 2,3)
+5. Assign result to leaf node when no significant gain
+6. For each record, classify using n decision trees and assign maximum occurrences argument as label
+
+OOB error estimate found to be 0.02 on average

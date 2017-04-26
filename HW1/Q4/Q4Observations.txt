@@ -1,0 +1,29 @@
+
+c(i)
+event Column - 1600
+venue Column - 104
+
+c(ii)
+value.toDate().datePart(“weekday”)+’, ’+value.toDate().toString(“MMMM dd, YYYY”)
+
+c(iii)
+
+venue contains nominal data where categories include political, foreign, military, government, education etc.
+
+status contains ordinal data where the original scale consists of 
+1. under review
+2. in progress
+3. complete.
+
+c(iv)
+
+or(value.contains("ENGLISH AND GERMAN"), value.contains("GERMAN AND ENGLISH"))
+
+c(v)
+
+value.chomp(“_wotm”)
+
+c(vi) 
+
+We can split a column into more than one column. For example, if we have a column whose values are “animal_breed, animal_species, animal_family” we can create 3 separate columns using Edit Column -> Split into several columns… with ‘;’ as separator for clearer interpretation of the data.
+ 

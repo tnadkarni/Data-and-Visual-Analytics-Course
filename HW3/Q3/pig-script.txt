@@ -1,0 +1,9 @@
+bigrams = LOAD 's3://cse6242-2017spring-bigrams-big/*' AS
+(bigram:chararray, year:int, occurrences:int, books:int);
+filtered_bigrams = FILTER bigrams BY (occurrences >= 100) AND (books >= 20);
+grouped_bigrams = GROUP filtered_bigrams BY bigram;
+count_bigrams = FOREACH grouped_bigrams GENERATE FLATTEN(group) AS bigram,
+AVG(filtered_bigrams.occurrences)/AVG(filtered_bigrams.books) AS apb;
+desc_bigrams = ORDER count_bigrams BY apb DESC, bigram ASC;
+final_bigrams = LIMIT desc_bigrams 10;
+STORE final_bigrams INTO 's3://cse6242-tnadkarni3/output-big/';

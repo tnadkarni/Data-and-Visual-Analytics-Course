@@ -1,0 +1,23 @@
+1. Accuracy
+
+SVM weighted - 0.354
+SVM unweighted Ð 0.746
+Boosted Decision Tree weighted - 0.659091
+Boosted Decision Tree unweighted Ð 0.582727
+
+2. Accuracy
+
+SVM weighted - 0.695714
+SVM unweighted Ð 0.767143
+Boosted Decision Tree weighted - 0.714506
+Boosted Decision Tree unweighted Ð 0.662037
+
+3. Accuracy
+
+SVM weighted - 0.695714
+SVM unweighted Ð 0.767143
+Boosted Decision Tree weighted - 0.63
+Boosted Decision Tree unweighted Ð 0.595455
+
+
+

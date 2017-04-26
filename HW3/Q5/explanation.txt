@@ -1,0 +1,1 @@
+Learning rate determines how fast the learner converges on the optimal solution. If step size is too big, you might overshoot optimal solution which is what happened here. Accuracy is reduced when learning rate is increased from 0.2 to 0.5 and so results are justified.

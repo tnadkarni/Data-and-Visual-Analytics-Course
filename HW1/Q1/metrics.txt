@@ -1,0 +1,5 @@
+* Average node degree = 1.03 (Number of edges adjacent to node)
+* Diameter of the graph = 4 (Maximum graph distance between a pair of nodes if graph distance between 2 connected nodes is 1)
+* Average Path Length = 3.698 (Average graph distance between all pairs of nodes)
+
+

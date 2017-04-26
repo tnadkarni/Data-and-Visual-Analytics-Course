@@ -1,0 +1,1 @@
+Q c.2Scaling is linear. Radius is equal to the degree of the nodes. Using square root made the difference in size less noticeable and this way the difference is noticeable.
